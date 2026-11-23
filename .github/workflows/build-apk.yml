@@ -50,17 +50,17 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
-      - uses: android-actions/setup-android@v3
-        with:
-          packages: ''
-
       - name: Install system tools
         run: |
           sudo apt-get update
           sudo apt-get install -y p7zip-full icoutils
           sudo apt-get install -y 7zip || true
           pip install brotli pillow
-          sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "ndk;${NDK_VERSION}"
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          SDKM=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" --install "platforms;android-36" "build-tools;36.0.0" "ndk;${NDK_VERSION}"
           npm i -g @tauri-apps/cli@^2
           echo "NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
 
