@@ -74,17 +74,11 @@ jobs:
         if: steps.cache-untauri.outputs.cache-hit != 'true'
         run: cargo install untauri --version 0.5.1 --locked
 
-      - name: Extract installer and find Tauri app
+      - name: Extract archives and find Tauri app
         run: |
           ls -la input
-          S7=7z; command -v 7zz >/dev/null && S7=7zz
-          mkdir -p work/installer
-          for f in input/*; do
-            case "$f" in
-              *.exe|*.msi|*.zip|*.7z) $S7 x -y -o"work/installer/$(basename "$f")" "$f" >/dev/null || true ;;
-            esac
-          done
-          APP_EXE=$(python tools/find_app_exe.py work/installer input/)
+          python tools/extract_all.py input work/extracted
+          APP_EXE=$(python tools/find_app_exe.py work/extracted input/)
           echo "APP_EXE=$APP_EXE" >> "$GITHUB_ENV"
           echo "App exe: $APP_EXE"
 
