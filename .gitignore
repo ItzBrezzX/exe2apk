@@ -1,0 +1,6 @@
+work/
+out/
+src-tauri/
+www/
+*.apk
+__pycache__/
